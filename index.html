@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>ListDiff - Compare multiple lists to find list differences</title>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+        <!-- Bootstrap/JQuery. -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" />
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+
+        <!-- 3rd party libraries. -->
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+        <script src="src/clipboard.min.js"></script>
+
+        <!-- My code. -->
+        <script src="src/list-diff.js"></script>
+        <link rel="stylesheet" href="src/list-diff.css" />
+    </head>
+    <body class="container mt-3">
+        <h1>ListDiff - Compare multiple lists to find list differences</h1>
+
+        <!-- ROW 1 -->
+        <form action="/compare-2-lists-difference-tool" method="POST" enctype="multipart/form-data" id="LDForm">
+
+            <div class="row">
+                <div class="col-md-6 col-xs-12 LDSwitch">
+                    <div class="panel panel-success">
+                        <div class="panel-heading">
+                            <h4>List A <span id="linesA" class="badge bdg-size pull-right" style="margin: 0px 0 0 5px" data-toggle="tooltip" title="Lines">0</span>
+                                <span id="dupesA" class="badge bdg-size pull-right" data-toggle="tooltip" title="Duplicates"> 0</span></h4>
+                        </div>
+                        <div class="panel-body" style="padding: 0px">
+                            <textarea id="txtBoxA" class="form-control mytextarea" name="lstA" rows="10" ></textarea>
+                        </div>
+                        <div class="panel-footer clearfix">
+                            <div class="pull-left">
+                                <a id="mvA2B" class="btn btn-default" style="font-size: medium" data-toggle="tooltip" title="Move A to B">A <i class="material-symbols-outlined">arrow_right_alt</i> B</a>
+                            </div>
+                            <div class="pull-right">
+                                <a id="splitA" class="btn btn-default" data-toggle="tooltip" title="Split CSV Lines On , : ; tab"><i class="material-symbols-outlined">link_off</i></a>
+                                <a id="trimA" class="btn btn-default" data-toggle="tooltip" title="Trim Spaces & Duplicates"><i class="material-symbols-outlined">playlist_remove</i></a>
+                                <a id="sortA" class="btn btn-default" data-toggle="tooltip" title="Sort"><i class="material-symbols-outlined">sort</i></a>									
+                                <a id="reverseA" class="btn btn-default" data-toggle="tooltip" title="Reverse Order"><i class="material-symbols-outlined">swap_vert</i></a>										
+                                <!--<a id="statsA" class="btn btn-default"  data-toggle="tooltip" title="Stats"><i class="fa fa-bar-chart" aria-hidden="true"></i></a>-->
+                                <a href="javascript:;" onclick="copyLBtoClipboard('#copyListA')" id="copyListA" data-clipboard-action="copy" data-clipboard-target="#txtBoxA" class="btn btn-default" data-toggle="tooltip" title="Copy"><i class="material-symbols-outlined">content_copy</i></a>								
+                                <a id="binA" class="btn btn-default" data-toggle="tooltip" title="Clear"><i class="material-symbols-outlined">delete</i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-xs-12 LDSwitch">
+                    <div class="panel panel-success">
+                        <div class="panel-heading">						
+                            <h4>List B <span id="linesB" class="badge bdg-size pull-right" style="margin: 0px 0 0 5px" data-toggle="tooltip" title="Lines">0</span>
+                                <span id="dupesB" class="badge bdg-size pull-right" data-toggle="tooltip" title="Duplicates">0</span></h4>
+                        </div>
+                        <div class="panel-body" style="padding: 0px">
+                            <textarea id="txtBoxB" class="form-control mytextarea" name="lstB" rows="10" ></textarea>
+                        </div>
+                        <div class="panel-footer clearfix">
+                            <div class="pull-left">
+                                <a id="mvB2A" class="btn btn-default" style="font-size: medium" data-toggle="tooltip" title="Move B to A">A <i class="material-symbols-outlined">arrow_left_alt</i> B</a>	
+                            </div>				
+                            <div class="pull-right">
+                                <a id="splitB" class="btn btn-default" data-toggle="tooltip" title="Split CSV Lines On , : ; tab"><i class="material-symbols-outlined">link_off</i></a>
+                                <a id="trimB" class="btn btn-default" data-toggle="tooltip" title="Trim Spaces & Duplicates"><i class="material-symbols-outlined">playlist_remove</i></a>
+                                <a id="sortB" class="btn btn-default" data-toggle="tooltip" title="Sort"><i class="material-symbols-outlined">sort</i></a>
+                                <a id="reverseB" class="btn btn-default" data-toggle="tooltip" title="Reverse Order"><i class="material-symbols-outlined">swap_vert</i></a>
+                                <a href="javascript:;" onclick="copyLBtoClipboard('#copyListB')" id="copyListB" data-clipboard-action="copy" data-clipboard-target="#txtBoxB" class="btn btn-default" data-toggle="tooltip" title="Copy"><i class="material-symbols-outlined">content_copy</i></a>
+                                <a id="binB" class="btn btn-default" data-toggle="tooltip" title="Clear"><i class="material-symbols-outlined">delete</i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xs-12 text-center">
+                <input type="button" id="submit"  form="LDForm" class="btn btn-lg btn-primary" value="Compare Lists">
+                <div class="pull-right">
+                    <a class="btn btn-default" data-toggle="tooltip" title="Options" id="btnConfig"><i class="material-symbols-outlined">rule</i></a>
+                    <a class="btn btn-default" data-toggle="tooltip" title="Switch Desktop / Laptop View"><i class="material-symbols-outlined" id="LDSwitcher">computer</i></a>
+                </div>
+            </div>
+
+            <div class="row"></div>
+            <br />
+
+            <div class="col-md-12 col-xs-12" id="ldConfig" style="display:block;">
+                <input type="hidden" id="configView" name="configView" value="block">
+                <div class="col-md-3 col-xs-12">
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" id="caseSen" name="caseSen" value=1  checked >
+                            Case sensitive
+                        </label>
+                    </div>
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" id="ignoreSpace" name="ignoreSpace" value=1  checked >
+                            Ignore begin & end spaces
+                        </label>
+                    </div>				
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" id="ignoreExtra" name="ignoreExtra" value=1  checked >
+                            Ignore extra spaces
+                        </label>
+                    </div>
+                </div>
+                <div class="col-md-3 col-xs-12">
+
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" id="ignoreZero" name="ignoreZero" value=1 >
+                            Ignore leading zeroes
+                        </label>
+                    </div>
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" id="lineNum" name="lineNum" value=1 >
+                            Line numbered
+                        </label>
+                    </div>				
+                </div>				
+                <div class="col-md-3 col-xs-12">
+                    <div class="input-group">
+                        <span class="input-group-addon"><span class="fa  fa-sort-amount-asc"></span></span>
+                        <select class="form-control" id="sortOption" name="sortOption">
+                            <option value="no-sort"  selected >No sort</option>
+                            <option value="az" >Sort A->z</option>
+                            <option value="za" >Sort z->A</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group">
+                        <span class="input-group-addon"><span class="fa fa-font"></span></span>
+                        <select class="form-control" id="caseChange" name="caseChange">
+                            <option value="no-case"  selected >No change</option>
+                            <option value="capitalize" >Capitalize</option>
+                            <option value="upper" >Uppercase</option>
+                            <option value="lower" >Lowercase</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+
+
+
+
+        <div class="row">
+            <div class="col-md-4 col-xs-12 LDSwitch2">
+                <div class="panel panel-info">
+                    <div class="panel-heading">						
+                        <h4>A only <span id="linesAOnly" data-toggle="tooltip" title="Lines" class="badge bdg-size pull-right">0</span></h4>
+                    </div>
+                    <div class="panel-body" style="padding: 0px">
+                        <textarea id="txtAOnly" class="form-control mytextarea" rows="10" placeholder="Values in A only"></textarea>
+                    </div>
+                    <div class="panel-footer clearfix">						
+                        <div class="pull-right">
+                            <a id="trimAO" class="btn btn-default" data-toggle="tooltip" title="Trim spaces & duplicates"><i class="material-symbols-outlined">playlist_remove</i></a>
+                            <a id="sortAO" class="btn btn-default" data-toggle="tooltip" title="Sort"><i class="material-symbols-outlined">sort</i></a>
+                            <a id="reverseAO" class="btn btn-default" data-toggle="tooltip" title="Reverse order"><i class="material-symbols-outlined">swap_vert</i></a>												
+                            <a href="javascript:;" onclick="copyLBtoClipboard('#copyAout')" id="copyAout" data-clipboard-action="copy" data-clipboard-target="#txtAOnly" class="btn btn-default" data-toggle="tooltip" title="Copy"><i class="material-symbols-outlined">content_copy</i></a>
+                        </div>
+                    </div>				
+                </div>
+            </div>
+
+            <div class="col-md-4 col-xs-12 LDSwitch2">
+                <div class="panel panel-danger">
+                    <div class="panel-heading">						
+                        <h4>A &cap; B <span id="linesAnB" data-toggle="tooltip" title="Lines" class="badge bdg-size pull-right">0</span></h4>
+                    </div>
+                    <div class="panel-body" style="padding: 0px">
+                        <textarea id="txtAnB" class="form-control mytextarea" rows="10" name="AunionB" placeholder="Values in A AND B"></textarea>
+                    </div>
+                    <div class="panel-footer clearfix">						
+                        <div class="pull-right">
+                            <a id="trimAnB" class="btn btn-default" data-toggle="tooltip" title="Trim Spaces & Duplicates"><i class="material-symbols-outlined">playlist_remove</i></a>
+                            <a id="sortAnB" class="btn btn-default" data-toggle="tooltip" title="Sort"><i class="material-symbols-outlined">sort</i></a>
+                            <a id="reverseAnB" class="btn btn-default" data-toggle="tooltip" title="Reverse order"><i class="material-symbols-outlined">swap_vert</i></a>										
+                            <a href="javascript:;" onclick="copyLBtoClipboard('#copyAuB')" id="copyAuB" data-clipboard-action="copy" data-clipboard-target="#txtAnB" class="btn btn-default" data-toggle="tooltip" title="Copy"><i class="material-symbols-outlined">content_copy</i></a>
+                        </div>
+                    </div>				
+                </div>
+            </div>
+            <div class="col-md-4 col-xs-12 LDSwitch2">
+                <div class="panel panel-info">
+                    <div class="panel-heading">						
+                        <h4>B only <span id="linesBOnly" data-toggle="tooltip" title="Lines" class="badge bdg-size pull-right">0</span></h4>
+                    </div>
+                    <div class="panel-body" style="padding: 0px">
+                        <textarea id="txtBOnly" class="form-control mytextarea" rows="10" placeholder="Values in B only"></textarea>
+                    </div>
+                    <div class="panel-footer clearfix">						
+                        <div class="pull-right">
+                            <a id="trimBO" class="btn btn-default" data-toggle="tooltip" title="Trim spaces & duplicates"><i class="material-symbols-outlined">playlist_remove</i></a>
+                            <a id="sortBO" class="btn btn-default" data-toggle="tooltip" title="Sort"><i class="material-symbols-outlined">sort</i></a>
+                            <a id="reverseBO" class="btn btn-default" data-toggle="tooltip" title="Reverse order"><i class="material-symbols-outlined">swap_vert</i></a>							
+                            <a href="javascript:;" onclick="copyLBtoClipboard('#copyBout')" id="copyBout" data-clipboard-action="copy" data-clipboard-target="#txtBOnly" class="btn btn-default" data-toggle="tooltip" title="Copy"><i class="material-symbols-outlined">content_copy</i></a>
+                        </div>
+                    </div>					
+                </div>
+            </div>
+
+        </div>	
+
+
+
+
+        <br />		
+        <div class="row">	
+            <div class="col-md-4 col-xs-12 LDSwitch2" id="adDiv2">
+                <div class="panel panel-success">
+                    <div class="panel-heading">						
+                        <h4>A &cup; B <span id="linesAuB" data-toggle="tooltip" title="Lines" class="badge bdg-size pull-right">0</span></h4>
+                    </div>
+                    <div class="panel-body" style="padding: 0px">
+                        <textarea id="txtAuB" class="form-control mytextarea" rows="10" placeholder="Values in A OR B"></textarea>
+                    </div>
+                    <div class="panel-footer clearfix">						
+                        <div class="pull-right">
+                            <a id="trimAuB" class="btn btn-default" data-toggle="tooltip" title="Trim spaces & duplicates"><i class="material-symbols-outlined">playlist_remove</i></a>
+                            <a id="sortAuB" class="btn btn-default" data-toggle="tooltip" title="Sort"><i class="material-symbols-outlined">sort</i></a>
+                            <a id="reverseAuB" class="btn btn-default" data-toggle="tooltip" title="Reverse order"><i class="material-symbols-outlined">swap_vert</i></a>							
+                            <a href="javascript:;" onclick="copyLBtoClipboard('#copyAorB')" id="copyAorB" data-clipboard-action="copy" data-clipboard-target="#txtAuB" class="btn btn-default" data-toggle="tooltip" title="Copy"><i class="material-symbols-outlined">content_copy</i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+        <div class="row" id="ldHelp">
+            <h1>Comparing differences between two lists</h1>
+
+            <br />
+            <ul>
+                <li>This list comparison tool will perform SET Operations over lists of words, numbers etc with formatted results</li>
+                <li>Operations including: Set Intersections (AND), Set Unions (OR) and Set Differences</li>
+                <li>Cut and Paste your lists into textbox A & B, then click <strong>Compare Lists</strong> to work out the differences between the two lists</li>
+                <li>There are other functionalities that you can perform over the results of the comparison including:</li>
+                <ul>
+                    <li>Case insensitive comparisons</li>
+                    <li>Remove extraneous spaces from your input and output</li>
+                    <li>Remove leading zeros from your data</li>
+                    <li>The output can also be sorted with a number of formatting options including HTML, Case Capitalisations, and numbered lines</li>
+                </ul>
+                <li>You can move the results between box A & B with the Switch function - this allows the output list to become the input list.
+                <li>The layout can be changed also for mobile or limited spaced screens</li>
+                <li>There are many use-cases for the tool from Finance, Engineering and Computing to any data reconciliation tasks.</li>
+                <li>It was initially built to help with the repetitive tasks of reconciling IDs and codes in my own job</li>
+                <li>I hope you find it as useful and remove some of the tediousness of comparing multiple lists without having to rewrite Excel functions to do the task</li>
+            </ul>
+        </div>
+        <br /><br />
+    </body>
+</html>

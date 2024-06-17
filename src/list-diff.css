@@ -1,0 +1,128 @@
+h1 {
+    font-family: arial, verdana, sans-serif;
+    font-size: 2.5em;
+}
+
+/* CCL: */
+.myselect {
+    /*margin-right: 20px;*/
+    overflow-y: auto;
+    text-align: center;
+    /*width: 300px;*/
+}
+
+.mytextarea { 
+    font-family: Consolas, Lucida Console, courier, monospace; 
+    white-space: pre;
+    overflow-wrap: normal;
+    overflow-x: scroll;
+    resize: none;
+}
+
+/*monospace TBox*/
+.msTBox { 
+    font-family: Consolas, Lucida Console, courier, courier new, monospace; 
+    font-size: small;
+    white-space: pre;
+    overflow-wrap: normal;
+    overflow-x: scroll;
+    resize: none;
+}
+
+select {
+    overflow-y: auto;
+}
+
+#ldConfig {
+    margin: 0 0 20px 0;
+    background:#f4f4f4; 
+    padding:1.5em; 
+    /* display:none; */
+}
+
+.headline {
+    text-align: left;
+}
+
+.headline h1 {
+    margin: 1.5em 0em 0.8em 0em;
+}
+
+.headline p {
+    margin-top: 0;
+}
+
+/* To allow for same height divs */
+@media only screen and (min-width : 768px) {
+    .is-table-row {
+        display: table;
+    }
+    .is-table-row [class*="col-"] {
+        float: none;
+        display: table-cell;
+        vertical-align: top;
+    }
+}
+
+.bdg-sm {
+    font-size: 1em;
+}
+.bdg-size {
+    font-size: 1.3em;
+}
+.bdg-danger {
+    background-color: #d43f3a;
+}
+
+code {
+    display: block;
+    padding: 10px;
+    background-color: #f4f4f4;
+    border-radius: 5px;
+}
+
+/* Num TextArea */
+.ed, .edNo {
+    font-family: Consolas, Lucida Console, courier, courier new, monospace; 
+    font-size: small;
+    white-space: pre;
+    margin: 0;
+    padding: 5px 0;
+    border-radius: 0;
+    border-style: none;
+    resize: none;
+    overflow-wrap: normal;    
+    outline: none;
+    overflow-x: scroll;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+}
+.ed {
+    padding-left: calc(5rem + 5px); /* required! */
+    width:100%;
+    /* Determine appearance of code editor */
+    background-color:#ffffff;
+    border-color:#272822;
+    /*color:#ffffff;*/
+}
+.edNo {
+    display: flex;
+    overflow: hidden;
+    /*
+    overflow-y: hidden;
+    overflow-x: hidden;*/
+    text-align: center;
+    box-shadow: none;
+    color: #dddada;
+    background-color: #b9b6b6;
+    position: absolute;
+    width: 5rem;    
+    /* Determine appearance of line counter */
+    background-color:#e2e2e2;
+    /*border-color:#3E3D32;*/
+    color:#928869;
+}
+.edNo:focus-visible{
+    outline:none;
+}
