@@ -21,6 +21,15 @@ function countDupes(t) {
     return n
 }
 
+function countDupes(arr) {
+    var counts = arr.reduce((acc, item) => {
+        acc[item] = (acc[item] || 0) + 1;
+        return acc;
+    }, {});
+    return Object.values(counts).filter(count => count > 1).length;
+}
+
+
 function recount(t) {
     switch (t) {
         case iA:
@@ -30,16 +39,16 @@ function recount(t) {
             countLines(t, "#linesB", "#dupesB");
             break;
         case AO:
-            countLines(t, "#linesAOnly", "");
+            countLines(t, "#linesAOnly", "#dupeslinesAOnly");
             break;
         case BO:
-            countLines(t, "#linesBOnly", "");
+            countLines(t, "#linesBOnly", "#dupeslinesBOnly");
             break;
         case AnB:
-            countLines(t, "#linesAnB", "");
+            countLines(t, "#linesAnB", "#dupeslinesAnB");
             break;
         case AuB:
-            countLines(t, "#linesAuB", "")
+            countLines(t, "#linesAuB", "#dupeslinesAuB")
     }
 }
 
@@ -174,7 +183,7 @@ $(document).ready((function () {
         console.log("Sort option: " + $("#sortOption").val());
         console.log("Case change: " + $("#caseChange").val());
         
-        // Copy list A and list B content to result lists.
+        // Copy txtBoxA and txtBoxB content to result lists.
         let listA = $("#txtBoxA").val();
         let listB = $("#txtBoxB").val();
         $("#txtAOnly").val(listA + "\n" + listB);
@@ -194,107 +203,155 @@ $(document).ready((function () {
 
 
 
+class ListComparator {
+    constructor() {
+        this.caseInsensitive = false;
+        this.ignoreBeginAndEndSpaces = false;
+        this.ignoreExtraSpaces = false;
+        this.ignoreLeadingZeroes = false;
+        this.addLineNumber = false;
+        this.caseChange = 'no-case';
 
+        this.onlyInA = [];
+        this.onlyInB = [];
+        this.inBoth = [];
+        this.inEither = [];
+    }
 
+    setCaseInsensitive(value) {
+        this.caseInsensitive = value;
+    }
 
+    setIgnoreBeginAndEndSpaces(value) {
+        this.ignoreBeginAndEndSpaces = value;
+    }
 
-$(document).ready(function() {
-    $('#submit').on('click', function() {
-        var listA = $('#txtBoxA').val().split('\n');
-        var listB = $('#txtBoxB').val().split('\n');
+    setIgnoreExtraSpaces(value) {
+        this.ignoreExtraSpaces = value;
+    }
 
-        // Apply checkboxes
-        if (!$('#caseSen').is(':checked')) {
-            listA = listA.map(line => line.toLowerCase());
-            listB = listB.map(line => line.toLowerCase());
+    setIgnoreLeadingZeroes(value) {
+        this.ignoreLeadingZeroes = value;
+    }
+
+    setAddLineNumber(value) {
+        this.addLineNumber = value;
+    }
+
+    setCaseChange(value) {
+        this.caseChange = value;
+    }
+
+    compareLists(listA, listB) {
+        listA = this.prepareList(listA);
+        listB = this.prepareList(listB);
+
+        this.onlyInA = listA.filter(x => !listB.includes(x));
+        this.onlyInB = listB.filter(x => !listA.includes(x));
+        this.inEither = [...this.onlyInA, ...this.onlyInB];
+        this.inBoth = [...listA, ...listB].filter(x => !this.inEither.includes(x));
+    }
+
+    prepareList(list) {
+        return list.map(x => {
+            if (this.ignoreBeginAndEndSpaces) x = x.trim();
+            if (this.ignoreExtraSpaces) x = x.replace(/\s+/g, ' ');
+            if (this.ignoreLeadingZeroes) x = x.replace(/^0+/g, '');
+            return this.caseInsensitive ? x.toLowerCase() : x;
+        });
+    }
+
+    formatList(list) {
+        list = list.map(x => {
+            if (this.caseChange === 'capitalize') x = x.charAt(0).toUpperCase() + x.slice(1).toLowerCase();
+            if (this.caseChange === 'upper') x = x.toUpperCase();
+            if (this.caseChange === 'lower') x = x.toLowerCase();
+            return x;
+        });
+        if (this.addLineNumber) {
+            list = list.map((x, i) => `${i + 1}. ${x}`);
+        }
+        return list;
+    }
+
+    formatList(list, sortOption) {
+        list = list.map(x => {
+            if (this.caseChange === 'capitalize') x = x.charAt(0).toUpperCase() + x.slice(1).toLowerCase();
+            if (this.caseChange === 'upper') x = x.toUpperCase();
+            if (this.caseChange === 'lower') x = x.toLowerCase();
+            return x;
+        });
+    
+        if (sortOption === 'az') {
+            list.sort((a, b) => a.localeCompare(b));
+        } else if (sortOption === 'za') {
+            list.sort((a, b) => b.localeCompare(a));
+        }
+    
+        if (this.addLineNumber) {
+            list = list.map((x, i) => `${i + 1}. ${x}`);
+        }
+        return list;
+    }
+}
+
+$(document).ready(function () {
+    $('#submit').on('click', function () {
+        var listA = [...$('#txtBoxA').val().split('\n').filter(line => line !== '')];
+        var listB = [...$('#txtBoxB').val().split('\n').filter(line => line !== '')];
+
+        var comparator = new ListComparator();
+
+        if ($('#caseSen').is(':checked')) {
+            comparator.setCaseInsensitive(true);
         }
         if ($('#ignoreSpace').is(':checked')) {
-            listA = listA.map(line => line.trim());
-            listB = listB.map(line => line.trim());
+            comparator.setIgnoreBeginAndEndSpaces(true);
         }
         if ($('#ignoreExtra').is(':checked')) {
-            listA = listA.map(line => line.replace(/\s+/g, ' '));
-            listB = listB.map(line => line.replace(/\s+/g, ' '));
+            comparator.setIgnoreExtraSpaces(true);
         }
         if ($('#ignoreZero').is(':checked')) {
-            listA = listA.map(line => line.replace(/^0+/, ''));
-            listB = listB.map(line => line.replace(/^0+/, ''));
+            comparator.setIgnoreLeadingZeroes(true);
+        }
+        if ($('#linenumbered').is(':checked')) {
+            comparator.setAddLineNumber(true);
         }
 
+        // Handle case change option
+        var caseChange = $('#caseChange').val();
+        comparator.setCaseChange(caseChange);
 
-        // Remove empty lines
-        listA = listA.filter(line => line !== '');
-        listB = listB.filter(line => line !== '');
-
-        // Find unique and common elements
-        var setA = new Set(listA);
-        var setB = new Set(listB);
-
-        var aOnly = listA.filter(line => !setB.has(line));
-        var bOnly = listB.filter(line => !setA.has(line));
-        var anB = listA.filter(line => setB.has(line));
-        var auB = [...new Set([...listA, ...listB])];
-
-        // Apply sorting
-        var sortOption = $('#sortOption').val();
-        if (sortOption === 'az') {
-            aOnly.sort();
-            bOnly.sort();
-            anB.sort();
-            auB.sort();
-        } else if (sortOption === 'za') {
-            aOnly.sort().reverse();
-            bOnly.sort().reverse();
-            anB.sort().reverse();
-            auB.sort().reverse();
-        }
-
-        // Apply case change
-        var caseChangeOption = $('#caseChange').val();
-        if (caseChangeOption === 'capitalize') {
-            aOnly = aOnly.map(line => line.charAt(0).toUpperCase() + line.slice(1).toLowerCase());
-            bOnly = bOnly.map(line => line.charAt(0).toUpperCase() + line.slice(1).toLowerCase());
-            anB = anB.map(line => line.charAt(0).toUpperCase() + line.slice(1).toLowerCase());
-            auB = auB.map(line => line.charAt(0).toUpperCase() + line.slice(1).toLowerCase());
-        } else if (caseChangeOption === 'upper') {
-            aOnly = aOnly.map(line => line.toUpperCase());
-            bOnly = bOnly.map(line => line.toUpperCase());
-            anB = anB.map(line => line.toUpperCase());
-            auB = auB.map(line => line.toUpperCase());
-        } else if (caseChangeOption === 'lower') {
-            aOnly = aOnly.map(line => line.toLowerCase());
-            bOnly = bOnly.map(line => line.toLowerCase());
-            anB = anB.map(line => line.toLowerCase());
-            auB = auB.map(line => line.toLowerCase());
-        }      
-
-        // Apply numbering if Line Numbered is checked
-        if ($('#lineNum').is(':checked')) {
-            aOnly = aOnly.map((line, index) => `${index + 1}. ${line}`);
-        }
-
-        if ($('#lineNum').is(':checked')) {
-            anB = anB.map((line, index) => `${index + 1}. ${line}`);
-        }
-
-        if ($('#lineNum').is(':checked')) {
-            bOnly = bOnly.map((line, index) => `${index + 1}. ${line}`);
-        }
-
-        if ($('#lineNum').is(':checked')) {
-            auB = auB.map((line, index) => `${index + 1}. ${line}`);
-        }
+        comparator.compareLists(listA, listB);
 
         // Place results in textareas
-        $('#txtAOnly').val(aOnly.join('\n'));
-        $('#txtAnB').val(anB.join('\n'));
-        $('#txtBOnly').val(bOnly.join('\n'));
-        $('#txtAuB').val(auB.join('\n'));
+        $('#txtAOnly').val(comparator.formatList(comparator.onlyInA).join('\n'));
+        $('#txtAnB').val(comparator.formatList(comparator.inBoth).join('\n'));
+        $('#txtBOnly').val(comparator.formatList(comparator.onlyInB).join('\n'));
+        $('#txtAuB').val(comparator.formatList(comparator.inEither).join('\n'));
 
         // Update line counts
-        $('#linesAOnly').text(aOnly.length);
-        $('#linesAnB').text(anB.length);
-        $('#linesBOnly').text(bOnly.length);
-        $('#linesAuB').text(auB.length);
+        $('#linesAOnly').text(comparator.onlyInA.length);
+        $('#linesAnB').text(comparator.inBoth.length);
+        $('#linesBOnly').text(comparator.onlyInB.length);
+        $('#linesAuB').text(comparator.inEither.length);
+
+        // Update duplicate counts
+        $('#dupeslinesAOnly').text(countDupes(comparator.onlyInA));
+        $('#dupeslinesAnB').text(countDupes(comparator.inBoth));
+        $('#dupeslinesBOnly').text(countDupes(comparator.onlyInB));
+        $('#dupeslinesAuB').text(countDupes(comparator.inEither));
+
+        var sortOption = $('#sortOption').val();
+
+$('#txtAOnly').val(comparator.formatList(comparator.onlyInA, sortOption).join('\n'));
+$('#txtAnB').val(comparator.formatList(comparator.inBoth, sortOption).join('\n'));
+$('#txtBOnly').val(comparator.formatList(comparator.onlyInB, sortOption).join('\n'));
+$('#txtAuB').val(comparator.formatList(comparator.inEither, sortOption).join('\n'));
     });
 });
+
+
+
+
+

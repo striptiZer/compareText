@@ -117,13 +117,7 @@
                             <input type="checkbox" id="ignoreZero" name="ignoreZero" value=1 >
                             Ignore leading zeroes
                         </label>
-                    </div>
-                    <div class="checkbox">
-                        <label>
-                            <input type="checkbox" id="lineNum" name="lineNum" value=1 >
-                            Line numbered
-                        </label>
-                    </div>				
+                    </div>			
                 </div>				
                 <div class="col-md-3 col-xs-12">
                     <div class="input-group">
@@ -144,7 +138,14 @@
                             <option value="lower" >Lowercase</option>
                         </select>
                     </div>
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" id="linenumbered" name="linenumbered" value=1  checked >
+                            Line numbered
+                        </label>
+                    </div>
                 </div>
+
             </div>
         </form>
 
@@ -156,7 +157,8 @@
             <div class="col-md-4 col-xs-12 LDSwitch2">
                 <div class="panel panel-info">
                     <div class="panel-heading">						
-                        <h4>A only <span id="linesAOnly" data-toggle="tooltip" title="Lines" class="badge bdg-size pull-right">0</span></h4>
+                        <h4>A only <span id="linesAOnly" data-toggle="tooltip" title="Lines" class="badge bdg-size pull-right" style="margin: 0px 0 0 5px">0</span>
+                            <span id="dupeslinesAOnly" class="badge bdg-size pull-right" data-toggle="tooltip" title="Duplicates">0</span></h4>
                     </div>
                     <div class="panel-body" style="padding: 0px">
                         <textarea id="txtAOnly" class="form-control mytextarea" rows="10" placeholder="Values in A only"></textarea>
@@ -175,7 +177,8 @@
             <div class="col-md-4 col-xs-12 LDSwitch2">
                 <div class="panel panel-danger">
                     <div class="panel-heading">						
-                        <h4>A &cap; B <span id="linesAnB" data-toggle="tooltip" title="Lines" class="badge bdg-size pull-right">0</span></h4>
+                        <h4>A &cap; B <span id="linesAnB" data-toggle="tooltip" title="Lines" class="badge bdg-size pull-right" style="margin: 0px 0 0 5px">0</span>
+                            <span id="dupeslinesAnB" class="badge bdg-size pull-right" data-toggle="tooltip" title="Duplicates">0</span></h4>
                     </div>
                     <div class="panel-body" style="padding: 0px">
                         <textarea id="txtAnB" class="form-control mytextarea" rows="10" name="AunionB" placeholder="Values in A AND B"></textarea>
@@ -193,7 +196,8 @@
             <div class="col-md-4 col-xs-12 LDSwitch2">
                 <div class="panel panel-info">
                     <div class="panel-heading">						
-                        <h4>B only <span id="linesBOnly" data-toggle="tooltip" title="Lines" class="badge bdg-size pull-right">0</span></h4>
+                        <h4>B only <span id="linesBOnly" data-toggle="tooltip" title="Lines" class="badge bdg-size pull-right" style="margin: 0px 0 0 5px">0</span>
+                            <span id="dupeslinesBOnly" class="badge bdg-size pull-right" data-toggle="tooltip" title="Duplicates">0</span></h4>
                     </div>
                     <div class="panel-body" style="padding: 0px">
                         <textarea id="txtBOnly" class="form-control mytextarea" rows="10" placeholder="Values in B only"></textarea>
@@ -219,7 +223,8 @@
             <div class="col-md-4 col-xs-12 LDSwitch2" id="adDiv2">
                 <div class="panel panel-success">
                     <div class="panel-heading">						
-                        <h4>A &cup; B <span id="linesAuB" data-toggle="tooltip" title="Lines" class="badge bdg-size pull-right">0</span></h4>
+                        <h4>A &cup; B <span id="linesAuB" data-toggle="tooltip" title="Lines" class="badge bdg-size pull-right" style="margin: 0px 0 0 5px">0</span>
+                            <span id="dupeslinesAuB" class="badge bdg-size pull-right" data-toggle="tooltip" title="Duplicates">0</span></h4>
                     </div>
                     <div class="panel-body" style="padding: 0px">
                         <textarea id="txtAuB" class="form-control mytextarea" rows="10" placeholder="Values in A OR B"></textarea>
